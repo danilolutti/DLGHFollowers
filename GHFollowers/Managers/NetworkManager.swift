@@ -34,7 +34,7 @@ class NetworkManager {
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             
             if let _ = error {
-                print(error)
+//                print(error ?? "error")
 
                 completed(.failure(.unableToComplete)) //connection error
                 return
@@ -42,7 +42,6 @@ class NetworkManager {
             
             
             guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-                print(response)
 
                 completed(.failure(.invalidResponse)) //server error: ≠ 200
                 return
@@ -71,5 +70,55 @@ class NetworkManager {
         
         task.resume()
     }
+    
+    func getUserInfo(for username: String, completed: @escaping (Result<User,GFError>) -> Void) {
+        
+        let endpoint = baseURL + "users/\(username)"
+        guard let url = URL(string: endpoint) else {
+            completed(.failure(.invalidUsername))
+            return
+        }
+        
+        
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            
+            if let _ = error {
+//                print(error ?? "error")
+
+                completed(.failure(.unableToComplete)) //connection error
+                return
+            }
+            
+            
+            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+
+                completed(.failure(.invalidResponse)) //server error: ≠ 200
+                return
+            }
+            
+            
+            guard let data = data else {
+                completed(.failure(.invalidData)) //data nil
+                return
+            }
+            
+            
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let user = try decoder.decode(User.self, from: data)
+                completed(.success(user)) //response & data & json decode OK
+            } catch {
+                print(error)
+                completed(.failure(.invalidData)) //deconding error
+            }
+            
+            
+            
+        }
+        
+        task.resume()
+    }
+    
     
 }

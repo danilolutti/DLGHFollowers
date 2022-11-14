@@ -87,7 +87,7 @@ class FolowerListVC: UIViewController {
                 
             case .success(let followers):
                 
-                print(followers)
+                //print(followers)
                 
                 if followers.count < 100 { self.hasMoreFollowers = false} //intercetta l'ultima pagina
                 
@@ -96,7 +96,7 @@ class FolowerListVC: UIViewController {
                 
                 if self.followers.isEmpty {
                     let message = "This user doesn't have any follower. Go Follow them!"
-                    print(message)
+                    //print(message)
                     DispatchQueue.main.async { self.showEmptyStateView(with: message, in: self.view) }
                     return
                 }
